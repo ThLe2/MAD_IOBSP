@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Évaluation finale du parcours</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#16243B; --blue:#1F4E79; --blue-2:#2E75B6; --paper:#F5F2EB;
+    --card:#FFFFFF; --ink:#1d2733; --muted:#5d6b7a; --line:#e3ddd0; --gold:#B08D57;
+    --ok:#2F7A4F; --ok-bg:#EAF4ED; --ko:#B23B3B; --ko-bg:#FAEDED;
+    --amber:#B5852A; --amber-bg:#FBF1DC;
+    --shadow:0 1px 2px rgba(22,36,59,.05),0 8px 24px rgba(22,36,59,.06);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Karla',-apple-system,system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:860px;margin:0 auto;padding:28px 20px 64px}
+  .card-main{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+  .header{background:var(--navy);color:#fff;padding:30px 34px}
+  .chapter-tag{display:inline-block;background:rgba(255,255,255,.14);color:#e9eef6;padding:5px 13px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:14px}
+  .chapter-tag span{color:var(--gold)}
+  .header h1{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:clamp(23px,4.2vw,33px);line-height:1.14;letter-spacing:-.01em;margin-bottom:8px}
+  .header p{font-size:14px;color:#b9c4d4}
+  .gold-rule{height:3px;width:60px;background:var(--gold);border:0;margin:16px 0 0}
+  .body{padding:30px 34px}
+  .identity{text-align:center;padding:14px 0}
+  .identity h2{font-family:'Fraunces',serif;font-weight:600;font-size:21px;color:var(--navy);margin-bottom:8px}
+  .identity p.sub{color:var(--muted);margin-bottom:26px;font-size:14.5px}
+  .form-group{margin-bottom:16px;text-align:left;max-width:420px;margin-left:auto;margin-right:auto}
+  .form-group label{display:block;font-size:13px;font-weight:700;color:var(--navy);margin-bottom:6px;letter-spacing:.02em}
+  .form-group input{width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:9px;font-size:15px;font-family:'Karla',sans-serif;transition:border-color .2s;background:#fdfcf9}
+  .form-group input:focus{outline:none;border-color:var(--blue-2)}
+  .btn{cursor:pointer;font-family:'Karla',sans-serif;font-weight:700;font-size:15px;letter-spacing:.03em;border-radius:10px;transition:transform .12s,box-shadow .15s,filter .15s,background .15s}
+  .btn-primary{background:var(--blue);color:#fff;border:none;padding:13px 34px;margin:6px}
+  .btn-primary:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 20px rgba(31,78,121,.28)}
+  .btn-primary:disabled{opacity:.45;cursor:not-allowed}
+  .btn-gold{background:var(--gold);color:var(--navy)}
+  .btn-gold:hover:not(:disabled){filter:brightness(1.06);transform:translateY(-2px)}
+  .btn-secondary{background:#fff;color:var(--blue);border:1.5px solid var(--blue);padding:11px 28px;margin:6px}
+  .btn-secondary:hover:not(:disabled){background:#f0f4f9}
+  .btn-secondary:disabled{opacity:.4;cursor:not-allowed;border-color:#bbb;color:#bbb}
+  .stagiaire-bar{background:#efeadf;padding:11px 34px;border-bottom:1px solid var(--line);font-size:13px;color:var(--muted);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+  .stagiaire-bar strong{color:var(--navy)}
+  .consigne{background:#fff;border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:13.5px;line-height:1.5;color:#3a4654}
+  .consigne b{color:var(--navy)}
+  .meta{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+  .progress{flex:1;min-width:180px}
+  .progress .track{height:8px;background:#e6e0d3;border-radius:99px;overflow:hidden}
+  .progress .fill{height:100%;width:0;background:var(--blue-2);border-radius:99px;transition:width .4s cubic-bezier(.2,.7,.2,1)}
+  .progress .plabel{font-size:12.5px;color:var(--muted);margin-top:6px}
+  .scorepill{font-family:'Fraunces',serif;font-weight:600;color:var(--navy);background:#fff;border:1px solid var(--line);border-radius:99px;padding:7px 15px;font-size:14.5px}
+  .scorepill b{color:var(--blue);font-size:17px}
+  .cq{background:#fff;border:1px solid var(--line);border-radius:11px;padding:16px 18px;margin-bottom:13px;box-shadow:var(--shadow)}
+  .cq .ask{font-weight:600;font-size:15px;color:var(--ink);margin-bottom:10px;display:flex;gap:10px;align-items:flex-start}
+  .cq .ask .qn{flex:none;width:26px;height:26px;border-radius:50%;background:var(--navy);color:#fff;font-family:'Fraunces',serif;font-weight:600;font-size:13px;display:flex;align-items:center;justify-content:center;margin-top:1px}
+  .theme-tag{display:inline-block;background:#eef3f9;color:var(--blue);font-size:11px;font-weight:700;border-radius:5px;padding:2px 8px;margin-left:8px;letter-spacing:.02em;vertical-align:middle;white-space:nowrap}
+  .multi-tag{display:inline-block;background:#fbf1dc;color:var(--amber);font-size:11px;font-weight:700;border-radius:5px;padding:2px 8px;margin-left:6px;letter-spacing:.02em;vertical-align:middle;white-space:nowrap}
+  select.cs{width:100%;padding:11px 13px;border:1.5px solid var(--line);border-radius:9px;font-size:14.5px;font-family:'Karla',sans-serif;background:#fdfcf9;color:var(--ink);cursor:pointer;transition:border-color .15s}
+  select.cs:focus{outline:none;border-color:var(--blue-2)}
+  select.cs:disabled{cursor:default;opacity:1}
+  select.cs.ok{border-color:var(--ok);background:var(--ok-bg);color:var(--ok)}
+  select.cs.ko{border-color:var(--ko);background:var(--ko-bg);color:var(--ko)}
+  .checks{display:flex;flex-direction:column;gap:8px}
+  .checks label{display:flex;gap:10px;align-items:flex-start;border:1.5px solid var(--line);border-radius:9px;padding:10px 13px;background:#fdfcf9;cursor:pointer;font-size:14.5px;transition:.15s}
+  .checks label:hover{border-color:var(--blue-2)}
+  .checks label.ok{border-color:var(--ok);background:var(--ok-bg)}
+  .checks label.ko{border-color:var(--ko);background:var(--ko-bg)}
+  .checks input{margin-top:3px}
+  .open-tag{display:inline-block;background:#eaf4ed;color:var(--ok);font-size:11px;font-weight:700;border-radius:5px;padding:2px 8px;margin-left:6px;letter-spacing:.02em;vertical-align:middle;white-space:nowrap}
+  textarea.oa{width:100%;min-height:96px;padding:11px 13px;border:1.5px solid var(--line);border-radius:9px;font-size:14.5px;font-family:'Karla',sans-serif;background:#fdfcf9;color:var(--ink);resize:vertical;line-height:1.5}
+  textarea.oa:focus{outline:none;border-color:var(--blue-2)}
+  textarea.oa:disabled{cursor:default;opacity:1;background:#f7f5ef;border-color:var(--gold)}
+  .oa-hint{font-size:11.5px;color:var(--muted);margin-top:5px;font-style:italic}
+  .model{background:#f7f5ef;border:1px solid var(--gold);border-radius:9px;padding:13px 15px;margin-top:11px}
+  .model h5{margin:0 0 7px;font-family:'Fraunces',Georgia,serif;font-size:14px;color:var(--navy)}
+  .model p{margin:0 0 7px;font-size:13.5px;line-height:1.55}
+  .model ul{margin:6px 0 0;padding-left:17px;font-size:13px}
+  .model li{margin-bottom:3px}
+  .model .ref{color:var(--gold);font-weight:700;font-size:11.5px}
+  .model .note{font-size:12px;color:var(--muted);font-style:italic;margin-top:8px;padding-top:7px;border-top:1px dashed var(--line)}
+  .pass-banner{border-radius:10px;padding:15px 18px;margin:14px 0 4px;font-size:14.5px;line-height:1.55}
+  .pass-banner.ok{background:var(--ok-bg);border:1.5px solid var(--ok);color:#1f5c39}
+  .pass-banner.ko{background:var(--amber-bg);border:1.5px solid var(--amber);color:#8a6420}
+  .pass-banner b{display:block;font-family:'Fraunces',Georgia,serif;font-size:16px;margin-bottom:5px}
+  .cfb{max-height:0;overflow:hidden;opacity:0;transition:max-height .4s,opacity .35s;font-size:13px;border-left:3px solid var(--line);padding-left:14px}
+  .cfb.show{max-height:320px;opacity:1;margin-top:12px}
+  .cfb.good{border-color:var(--ok);color:#1c5234} .cfb.bad{border-color:var(--ko);color:#7a2222}
+  .cfb .vd{font-weight:700}
+  .cfb .ref{display:inline-block;margin-top:6px;font-size:12px;color:var(--blue);background:#eef3f9;border-radius:6px;padding:2px 8px;font-weight:600}
+  .actions{margin-top:24px;text-align:center}
+  .result-screen{text-align:center;padding:20px 0}
+  .score-circle{width:132px;height:132px;border-radius:50%;margin:0 auto 18px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;box-shadow:0 8px 24px rgba(22,36,59,.18)}
+  .score-circle.excellent{background:var(--ok)} .score-circle.good{background:var(--blue)}
+  .score-circle.average{background:var(--amber)} .score-circle.poor{background:var(--ko)}
+  .score-circle .sv{font-family:'Fraunces',serif;font-size:30px;font-weight:600}
+  .score-circle .sl{font-size:12px;opacity:.95;margin-top:2px;letter-spacing:.05em}
+  .result-msg{font-family:'Fraunces',serif;font-size:21px;font-weight:600;margin-bottom:8px;color:var(--navy)}
+  .result-detail{color:var(--muted);font-size:14px;margin-bottom:20px;max-width:56ch;margin-left:auto;margin-right:auto}
+  .recap{text-align:left;max-width:600px;margin:0 auto 8px}
+  .recap h4{font-family:'Fraunces',serif;font-weight:600;font-size:15px;color:var(--navy);margin-bottom:6px}
+  .recap-row{display:flex;align-items:center;gap:11px;padding:9px 4px;border-bottom:1px solid var(--line);font-size:13.5px}
+  .recap-row .dot{flex:none;width:11px;height:11px;border-radius:50%}
+  .recap-row .lab{flex:1;color:var(--ink)}
+  .recap-row .sc{font-weight:700;color:var(--navy);font-variant-numeric:tabular-nums}
+  .recap-row .hint{flex-basis:100%;font-size:12px;color:var(--blue);padding-left:22px}
+  .pdf-info{background:var(--amber-bg);border-left:4px solid var(--amber);padding:12px 16px;border-radius:8px;text-align:left;font-size:13px;color:#6d4c00;margin:18px 0}
+  .pdf-info strong{display:block;margin-bottom:4px}
+  .note{background:#eef3f9;border-left:4px solid var(--blue-2);padding:12px 16px;border-radius:8px;text-align:left;font-size:13px;color:var(--blue);margin:16px 0;line-height:1.5}
+  footer{margin-top:26px;text-align:center;font-size:12px;color:#9a9384;letter-spacing:.04em}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card-main">
+    <div class="header">
+      <div class="chapter-tag">TMK Performances · IOBSP Niveau 2 <span>/</span> Évaluation finale du parcours</div>
+      <h1>Évaluation finale du parcours</h1>
+      <p>IOBSP Niveau 2 · bilan des douze journées · 40 questions · 22 à choix et 18 rédigées</p>
+      <hr class="gold-rule">
+    </div>
+
+    <div id="screen-identity" class="body">
+      <div class="identity">
+        <h2>Avant de commencer</h2>
+        <p class="sub">Renseignez vos informations pour personnaliser votre attestation de réussite.</p>
+        <div class="form-group"><label for="nom">Nom</label><input type="text" id="nom" placeholder="Votre nom de famille" autocomplete="family-name"></div>
+        <div class="form-group"><label for="prenom">Prénom</label><input type="text" id="prenom" placeholder="Votre prénom" autocomplete="given-name"></div>
+        <button class="btn btn-primary" id="btn-start" disabled onclick="startQuiz()">Commencer l'évaluation</button>
+      </div>
+    </div>
+
+    <div id="screen-quiz" style="display:none;">
+      <div class="stagiaire-bar"><span>Stagiaire&nbsp;: <strong id="stagiaire-name"></strong></span><span id="date-quiz"></span></div>
+      <div class="body">
+        <div class="consigne"><b>Évaluation finale du parcours.</b> Elle ne porte pas sur la seule journée 12 : elle a valeur de BILAN et mobilise l'ensemble des douze journées — le cadre et le mandat, les obligations et les sanctions, le crédit à la consommation, le crédit immobilier, les garanties et les produits, le regroupement de crédits et le dossier. Elle comporte <b>22 questions à choix</b> puis <b>18 questions rédigées</b>, dans cet ordre — comme à l'épreuve, qui compte 55 questions à choix et 45 questions rédigées, avec 70 % exigés. <b>Le score porte uniquement sur les questions à choix</b> ; les questions rédigées ne sont pas notées automatiquement, la réponse attendue s'affiche après validation et votre rédaction est reprise dans l'attestation. Le seuil de réussite est fixé à <b>70 %</b>.</div>
+        <div class="meta">
+          <div class="progress"><div class="track"><div class="fill" id="fill"></div></div><div class="plabel" id="plabel">0 / 40 répondu</div></div>
+          <div class="scorepill">Score&nbsp;: <b id="score">—</b> / 22</div>
+        </div>
+        <div id="qcm"></div>
+        <div class="actions"><button class="btn btn-primary" id="btn-validate" disabled onclick="validateQuiz()">Validation et génération du PDF</button></div>
+      </div>
+    </div>
+
+    <div id="screen-result" style="display:none;">
+      <div class="stagiaire-bar"><span>Stagiaire&nbsp;: <strong id="stagiaire-name-2"></strong></span><span id="date-quiz-2"></span></div>
+      <div class="body">
+        <div class="result-screen">
+          <div class="score-circle" id="score-circle"><div class="sv" id="score-value">0/22</div><div class="sl" id="score-label">questions</div></div>
+          <div class="result-msg" id="result-message"></div>
+          <div id="pass-banner" style="display:none;"></div>
+          <div class="result-detail" id="result-detail"></div>
+          <div class="recap" id="recap-block"><h4>Bilan par thème</h4><div id="recap-list"></div></div>
+          <div class="note" id="note-pdf" style="display:none;"></div>
+          <div class="actions">
+            <button class="btn btn-secondary" id="btn-restart" onclick="restartQuiz()">↻ Refaire l'évaluation</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>TMK Performances · IOBSP Niveau 2 · Évaluation finale du parcours</footer>
+  </div>
+</div>
+
+<script>
+const CFG = {"THEME_INFO": {"A": {"label": "Le cadre, le mandat et la rémunération"}, "B": {"label": "Les obligations de l'intermédiaire et les sanctions"}, "C": {"label": "Le crédit à la consommation"}, "D": {"label": "Le crédit immobilier — cadre, TAEG et délais"}, "E": {"label": "Les garanties et les produits"}, "F": {"label": "Le regroupement de crédits"}, "G": {"label": "Le dossier — FISE, offre et constitution"}}, "THEME_ORDER": ["A", "B", "C", "D", "E", "F", "G"], "QUESTIONS": [{"th": "A", "kind": "qcm", "ask": "Quelle affirmation est exacte s'agissant du mandat de l'intermédiaire ?", "options": ["Il peut être verbal dès lors que la mission est claire", "Il est écrit, il précise la mission confiée et il conditionne la rémunération", "Il vaut engagement du prêteur sur les conditions annoncées", "Il n'est exigé qu'en matière de crédit immobilier"], "correct": [1], "multi": false, "expl": "Le mandat précise notamment l'étendue de la recherche. C'est une protection pour le client comme pour l'intermédiaire.", "ref": "Journée 5, rappelée en journée 12"}, {"th": "A", "kind": "qcm", "ask": "Un client accepte par écrit de verser 400 € de frais d'étude à la signature du mandat, avant tout déblocage. Que faut-il en penser ?", "options": ["C'est possible puisque le client a donné son accord écrit", "C'est possible à condition que la somme soit déduite du coût final", "C'est interdit : rien ne peut être perçu avant le versement effectif des fonds, et l'accord du client est sans effet", "C'est possible si le mandat le prévoit expressément"], "correct": [2], "multi": false, "expl": "Le manquement est caractérisé indépendamment de l'accord du client, auquel celui-ci ne peut pas renoncer.", "ref": "Journée 4"}, {"th": "A", "kind": "qcm", "ask": "Un mandat de recherche auprès de l'ensemble du marché et un mandat limité à quelques établissements :", "options": ["ont la même portée dès lors que le client a signé", "n'ont pas la même portée, et la précision protège les deux parties", "sont interdits l'un comme l'autre en crédit immobilier", "se distinguent seulement par le niveau de rémunération"], "correct": [1], "multi": false, "expl": "Préciser l'étendue de la recherche évite au client de croire à une exhaustivité qui n'existe pas, et protège l'intermédiaire d'un reproche ultérieur.", "ref": "Journée 12, séquence 3"}, {"th": "B", "kind": "qcm", "ask": "Qu'est-ce qui distingue le devoir de conseil du devoir de mise en garde ?", "options": ["Le premier alerte sur un risque, le second oriente vers une solution", "Le premier oriente vers une solution adaptée, le second alerte sur un risque", "Ils désignent la même obligation sous deux noms", "Le premier ne s'applique qu'au crédit immobilier"], "correct": [1], "multi": false, "expl": "Ils ne se confondent pas et se cumulent : on peut orienter vers une solution adaptée tout en devant alerter sur ce qu'elle comporte de risqué.", "ref": "Journées 5 et 12"}, {"th": "B", "kind": "qcm", "ask": "Quelles obligations pèsent sur l'intermédiaire AVANT la conclusion du contrat ? (plusieurs réponses)", "options": ["L'information précontractuelle", "Les explications adéquates, adaptées au niveau de connaissance du client", "L'évaluation de la solvabilité et la consultation du fichier des incidents", "La remise systématique d'une simulation établie par un notaire"], "correct": [0, 1, 2], "multi": true, "expl": "S'y ajoutent la transparence sur la rémunération et, en permanence, les règles de bonne conduite.", "ref": "Journée 12, séquence 6"}, {"th": "B", "kind": "qcm", "ask": "Le défaut d'immatriculation et l'exercice illégal de la profession :", "options": ["sont deux dénominations du même manquement", "ne relèvent ni des mêmes textes ni des mêmes peines", "relèvent du même texte mais de deux autorités différentes", "sont tous deux dépourvus de sanction pénale"], "correct": [1], "multi": false, "expl": "C'est la confusion la plus fréquente de la journée 4. Les qualifications, les autorités compétentes et les peines diffèrent.", "ref": "Journée 4"}, {"th": "C", "kind": "qcm", "ask": "Quelles sont les trois catégories de crédit à la consommation ?", "options": ["Amortissable, renouvelable, location avec option d'achat", "Amortissable, in fine, relais", "Affecté, hypothécaire, renouvelable", "Personnel, professionnel, viager"], "correct": [0], "multi": false, "expl": "Le renouvelable est le point le plus encadré du régime, et celui sur lequel les questions d'examen sont les plus nombreuses.", "ref": "Journées 1 à 3, rappelées en journée 12"}, {"th": "C", "kind": "qcm", "ask": "Quel crédit à la consommation est le seul dont le sort est lié à celui du contrat financé ?", "options": ["Le prêt personnel", "Le crédit renouvelable", "Le crédit affecté", "La location avec option d'achat"], "correct": [2], "multi": false, "expl": "Si la vente est annulée, le crédit affecté l'est aussi. C'est son interdépendance qui le caractérise.", "ref": "Journée 3, mobilisée en journées 9 et 12"}, {"th": "C", "kind": "qcm", "ask": "La réforme du 20 novembre 2026 concerne :", "options": ["le crédit immobilier", "le crédit à la consommation", "les deux régimes indifféremment", "le seul regroupement de crédits"], "correct": [1], "multi": false, "expl": "Elle procède de la transposition de la directive européenne de 2023 sur les contrats de crédit aux consommateurs. Son état d'application effective est à vérifier : les supports la mentionnent sans la chiffrer.", "ref": "Journée 12, séquence 5"}, {"th": "D", "kind": "qcm", "ask": "En crédit immobilier, à partir de quand l'offre de prêt peut-elle être acceptée ?", "options": ["Dès sa réception, si l'emprunteur y renonce expressément", "Au onzième jour suivant sa réception", "Au dixième jour suivant son édition", "À l'expiration d'un délai de trente jours"], "correct": [1], "multi": false, "expl": "Dix jours de réflexion à compter de la RÉCEPTION, acceptation au onzième jour. Règle d'ordre public dont la sanction est la nullité du contrat de prêt. Le prêteur maintient par ailleurs ses conditions au moins trente jours.", "ref": "C. consom., art. L. 313-34 — journée 6"}, {"th": "D", "kind": "qcm", "ask": "« L'acquéreur se rétracte, l'emprunteur réfléchit ». Que recouvre cette formule ?", "options": ["Deux appellations du même délai de dix jours", "Deux délais distincts : la rétractation bénéficie à l'acquéreur après notification de l'avant-contrat, la réflexion à l'emprunteur après réception de l'offre", "Un délai unique courant à compter de la signature du compromis", "Une faculté laissée au choix du client"], "correct": [1], "multi": false, "expl": "Deux délais de dix jours, deux bénéficiaires, deux points de départ : les confondre conduit à annoncer un calendrier faux.", "ref": "Journée 6 — CCH, art. L. 271-1 et C. consom., art. L. 313-34"}, {"th": "D", "kind": "qcm", "ask": "Lesquels de ces éléments entrent dans le TAEG ? (plusieurs réponses)", "options": ["Les intérêts", "Les frais de dossier", "L'assurance exigée par le prêteur", "Les frais de notaire d'acquisition"], "correct": [0, 1, 2], "multi": true, "expl": "Le critère est unique : tout ce qui CONDITIONNE L'OCTROI. Les frais de notaire d'acquisition portent sur la vente, non sur le crédit — comme les assurances facultatives et les indemnités de remboursement anticipé.", "ref": "Journée 6, module 4"}, {"th": "E", "kind": "qcm", "ask": "Quelle affirmation est exacte s'agissant du prêt in fine ?", "options": ["Il coûte moins cher qu'un amortissable de même durée", "Il coûte davantage en intérêts ; sa logique est fiscale", "Il est réservé aux primo-accédants", "Il ne peut être garanti que par une caution"], "correct": [1], "multi": false, "expl": "Le capital n'étant pas amorti, les intérêts se calculent sur la totalité du capital pendant toute la durée. L'intérêt du montage est ailleurs.", "ref": "Journée 8, séquence 1"}, {"th": "E", "kind": "qcm", "ask": "Quel est le risque principal du prêt relais, celui qu'il faut nommer au client ?", "options": ["Que le taux augmente en cours de période", "Que le bien ne se vende pas, ou se vende moins cher que prévu", "Que la banque refuse de débloquer les fonds", "Que l'assurance emprunteur soit refusée"], "correct": [1], "multi": false, "expl": "Le montage repose sur une hypothèse de vente. Si elle ne se réalise pas, ou à un prix inférieur, l'emprunteur se retrouve avec deux engagements.", "ref": "Journée 8, séquence 1"}, {"th": "E", "kind": "qcm", "ask": "Que permet la convention AERAS ?", "options": ["Elle ouvre un droit à l'assurance emprunteur", "Elle repousse les limites de l'assurabilité, sans ouvrir de droit", "Elle supprime le questionnaire de santé dans tous les cas", "Elle impose au prêteur d'accepter une délégation"], "correct": [1], "multi": false, "expl": "C'est la nuance à tenir devant un client : la convention organise un examen à plusieurs niveaux, elle ne garantit pas un résultat.", "ref": "Journée 8, séquence 6"}, {"th": "F", "kind": "qcm", "ask": "Sur quelle assiette la part de 60 % des crédits immobiliers s'apprécie-t-elle dans un regroupement ?", "options": ["Sur le seul capital restant dû", "Sur le montant total de l'opération, coûts compris", "Sur la valeur du bien financé", "Sur le montant du nouveau prêt, hors frais"], "correct": [1], "multi": false, "expl": "Le montant des crédits immobiliers inclut intérêts, commissions, taxes, pénalités et frais dus pour leur remboursement. Raisonner sur le capital nu conduit à se tromper de régime.", "ref": "C. consom., art. R. 314-19 — journée 9"}, {"th": "F", "kind": "qcm", "ask": "Une opération de regroupement porte exclusivement sur des crédits à la consommation, mais elle est garantie par une hypothèque sur la résidence principale. Quel régime s'applique ?", "options": ["Celui du crédit à la consommation, l'objet commandant le régime", "Celui du crédit immobilier, quel que soit l'objet de l'opération", "Celui que désigne le calcul de la part de 60 %", "Un régime mixte, chaque crédit conservant le sien"], "correct": [1], "multi": false, "expl": "La garantie hypothécaire emporte le régime immobilier, et le seuil de 60 % ne s'applique alors même pas. La garantie D'ABORD, le seuil ENSUITE.", "ref": "Journées 9 et 11"}, {"th": "F", "kind": "qcm", "ask": "Sous un régime communautaire, un époux emprunte seul, sans le consentement exprès de son conjoint. Qu'engage-t-il ?", "options": ["Les biens communs et ses biens propres", "Ses seuls biens propres et ses revenus", "Les biens communs uniquement", "Rien tant que le conjoint n'a pas signé"], "correct": [1], "multi": false, "expl": "Les biens communs sont PROTÉGÉS. Le consentement exprès du conjoint élargit le gage aux biens communs sans engager les biens propres du consentant, et sans en faire un débiteur.", "ref": "C. civ., art. 1415 — journée 11"}, {"th": "G", "kind": "qcm", "ask": "Qui doit remettre la fiche d'information standardisée européenne ?", "options": ["Le prêteur seul", "Le notaire", "Le prêteur OU l'intermédiaire de crédit", "L'intermédiaire seul, lorsqu'il en existe un"], "correct": [2], "multi": false, "expl": "L'obligation ne pèse pas seulement sur la banque. La fiche est remise gratuitement, au plus tard lors de l'émission de l'offre, sur support durable et sous la forme d'un document unique.", "ref": "C. consom., art. L. 313-7 — journée 12"}, {"th": "G", "kind": "qcm", "ask": "Quelle est la différence de portée entre la FISE et l'offre de prêt ?", "options": ["La FISE engage le prêteur, l'offre l'informe", "La FISE informe, l'offre engage", "Les deux engagent le prêteur dans les mêmes termes", "Aucune des deux n'engage le prêteur avant acceptation"], "correct": [1], "multi": false, "expl": "Le prêteur est tenu par les conditions de son offre ; il ne l'est pas par celles de sa fiche. C'est la confusion la plus fréquente.", "ref": "Journée 12, séquence 2"}, {"th": "G", "kind": "qcm", "ask": "Dans quel ordre un dossier de crédit immobilier se constitue-t-il ?", "options": ["Dans l'ordre du formulaire de la banque", "En commençant par les pièces les plus faciles à obtenir", "Dans l'ordre du RISQUE DE BLOCAGE", "Dans l'ordre chronologique de l'opération"], "correct": [2], "multi": false, "expl": "Le blocage le plus fréquent et le plus long à lever est la chaîne des titres publiés lorsque le bien provient d'une succession. Un dossier constitué dans le désordre se bloque au dernier moment.", "ref": "Journée 12, séquence 3"}, {"th": "G", "kind": "qcm", "ask": "Vous relevez un écart entre ce qui a été négocié et ce que porte l'offre. Que faites-vous ?", "options": ["Vous le signalez après acceptation, pour ne pas retarder le dossier", "Vous le relevez AVANT acceptation : après, ce n'est plus un point à corriger mais un contentieux", "Vous laissez le client décider s'il souhaite le relever", "Vous considérez qu'un écart est nécessairement une faute du prêteur"], "correct": [1], "multi": false, "expl": "Trois éléments doivent concorder : le négocié, la FISE et l'offre. Un écart n'est pas nécessairement une faute — c'est souvent un oubli ou une erreur de saisie — mais il se traite avant acceptation.", "ref": "Journée 12, séquence 2"}, {"th": "A", "kind": "open", "ask": "Que doit contenir le mandat de l'intermédiaire, et à quoi engage-t-il ?", "model": "Le mandat est ÉCRIT. Il précise la mission confiée à l'intermédiaire et, sur un dossier immobilier, l'étendue de la recherche : un mandat auprès de l'ensemble du marché n'a pas la même portée qu'un mandat limité à quelques établissements. Il CONDITIONNE LA RÉMUNÉRATION, laquelle ne peut en tout état de cause être perçue avant le versement effectif des fonds prêtés. Cette précision protège le client comme l'intermédiaire.", "points": ["Écrit", "Il précise la mission", "Il précise l'étendue de la recherche", "Il conditionne la rémunération", "Rien ne peut être perçu avant le versement effectif des fonds"], "expl": "", "ref": "Journées 4 et 5, mobilisées en journée 12", "minlen": 40}, {"th": "A", "kind": "open", "ask": "Un client vous propose de régler des frais d'étude au moment de la signature du mandat, et vous confirme son accord par écrit. Que lui répondez-vous, et pourquoi ?", "model": "Que ce n'est pas possible. Aucune somme ne peut être perçue, à quelque titre que ce soit, avant le versement effectif des fonds prêtés. L'accord écrit du client est SANS EFFET : il ne peut pas renoncer à une protection d'ordre public, et le manquement serait caractérisé malgré son consentement. On l'explique sans en faire porter la responsabilité à la réglementation : c'est une garantie pour lui.", "points": ["Refuser", "Rien avant le versement effectif des fonds", "L'accord du client est sans effet", "Le manquement serait caractérisé malgré son consentement", "L'expliquer comme une protection, pas comme une contrainte administrative"], "expl": "", "ref": "Journée 4", "minlen": 40}, {"th": "B", "kind": "open", "ask": "Distinguez le devoir de conseil du devoir de mise en garde, et donnez un exemple de situation où les deux se rencontrent.", "model": "Le devoir de conseil consiste à orienter le client vers une solution adaptée à sa situation et à son projet. Le devoir de mise en garde consiste à l'alerter sur un risque. Ils ne se confondent pas et se cumulent. Exemple : un prêt relais est la solution adaptée au client qui achète avant d'avoir vendu — c'est le conseil — mais il faut lui dire que le bien peut ne pas se vendre, ou se vendre moins cher que prévu, et ce qu'il adviendrait alors — c'est la mise en garde.", "points": ["Le conseil oriente vers une solution adaptée", "La mise en garde alerte sur un risque", "Les deux se cumulent", "Un exemple concret et correct"], "expl": "", "ref": "Journées 5 et 8", "minlen": 40}, {"th": "B", "kind": "open", "ask": "Énumérez, dans l'ordre chronologique, les obligations qui pèsent sur l'intermédiaire, du premier contact à la conclusion.", "model": "Avant tout : l'information précontractuelle et les explications adéquates, adaptées au niveau de connaissance du client. À l'instruction : l'évaluation de la solvabilité et la consultation du fichier des incidents. Au conseil : le devoir de conseil et le devoir de mise en garde. Sur la rémunération : la transparence, et l'interdiction de percevoir avant le versement effectif des fonds. En permanence : les règles de bonne conduite et le dispositif de contrôle. Dans la durée : la formation continue et le maintien des compétences. Ces obligations sont les mêmes que le crédit soit immobilier ou à la consommation ; ce sont les délais, les documents et les seuils qui changent.", "points": ["Information précontractuelle et explications adéquates", "Évaluation de la solvabilité et consultation du fichier des incidents", "Devoir de conseil et devoir de mise en garde", "Transparence sur la rémunération", "Règles de bonne conduite et contrôle", "Formation continue", "Les obligations ne changent pas selon le type de crédit"], "expl": "", "ref": "Journée 12, séquence 6", "minlen": 40}, {"th": "B", "kind": "open", "ask": "Un intermédiaire propose un crédit renouvelable à un client sans lui avoir remis d'information précontractuelle et sans avoir évalué sa solvabilité. Il indique que le client était connu de longue date et pressé. Qualifiez.", "model": "Il y a DEUX manquements, et non un seul : le défaut d'information précontractuelle et le défaut d'évaluation de la solvabilité, à laquelle s'ajoute, le cas échéant, l'absence de consultation du fichier des incidents. L'ancienneté de la relation et l'impatience du client ne sont pas des causes d'exonération : ces obligations ne se négocient pas au cas par cas. Ce sont des manquements d'instruction, qui engagent la responsabilité et peuvent être relevés lors d'un contrôle — il faut savoir nommer l'autorité compétente.", "points": ["Deux manquements distincts", "Défaut d'information précontractuelle", "Défaut d'évaluation de la solvabilité", "L'ancienneté de la relation n'exonère pas", "L'impatience du client non plus", "Savoir nommer l'autorité compétente"], "expl": "", "ref": "Journées 4 et 12", "minlen": 40}, {"th": "C", "kind": "open", "ask": "Citez les catégories de crédit à la consommation et précisez ce qui distingue le crédit affecté des autres.", "model": "Le crédit amortissable, le crédit renouvelable et la location avec option d'achat ; le crédit affecté est une forme de crédit amortissable liée à un achat déterminé. CE QUI LE DISTINGUE : son sort est lié à celui du contrat financé. Si la vente est annulée ou résolue, le crédit l'est aussi ; c'est le seul dans ce cas. Le renouvelable, lui, est le point le plus encadré du régime, avec ses règles propres de reconduction et d'information annuelle.", "points": ["Amortissable", "Renouvelable", "Location avec option d'achat", "Le crédit affecté est lié au contrat financé", "Annulation de la vente entraîne celle du crédit", "Le renouvelable est le plus encadré"], "expl": "", "ref": "Journées 1 à 3", "minlen": 40}, {"th": "C", "kind": "open", "ask": "Un client qui a quatre crédits, deux échéances impayées et un découvert permanent vous demande « un crédit de plus, juste pour passer le mois ». Que faites-vous, que ne faites-vous pas, et vers qui orientez-vous ?", "model": "CE QU'IL FAUT FAIRE : écouter, établir la situation réelle — tous les crédits, les impayés et depuis quand, le reste à vivre — et informer le client des dispositifs existants. CE QU'IL NE FAUT PAS FAIRE : proposer un nouveau crédit pour résoudre une difficulté de remboursement, ce qui aggraverait la situation, ni s'improviser conseil en surendettement. VERS QUI ORIENTER : les dispositifs compétents en matière de surendettement. C'est la même frontière qu'en regroupement de crédits : quand la situation est irrémédiablement compromise, on oriente, on ne monte pas.", "points": ["Écouter et établir la situation réelle", "Ne pas proposer un crédit de plus", "Ne pas s'improviser conseil en surendettement", "Orienter vers les dispositifs compétents", "La même frontière qu'en regroupement"], "expl": "", "ref": "Journées 9, 11 et 12", "minlen": 40}, {"th": "D", "kind": "open", "ask": "Exposez les délais applicables à l'offre de prêt immobilier, leur point de départ et la sanction attachée.", "model": "L'emprunteur dispose d'un délai de réflexion de DIX JOURS à compter de la RÉCEPTION de l'offre ; l'acceptation ne peut intervenir qu'à partir du ONZIÈME JOUR. C'est une règle d'ordre public, sanctionnée par la NULLITÉ du contrat de prêt : une acceptation anticipée fragilise tout le financement, y compris pour un client pressé. Le prêteur maintient par ailleurs les conditions de son offre pendant AU MOINS TRENTE JOURS. Ce délai ne doit pas être confondu avec la rétractation de l'acquéreur, également de dix jours mais courant à compter de la notification de l'avant-contrat : l'acquéreur se rétracte, l'emprunteur réfléchit.", "points": ["Dix jours de réflexion", "À compter de la réception de l'offre", "Acceptation au onzième jour", "Règle d'ordre public, sanction de nullité", "Maintien des conditions au moins trente jours", "Ne pas confondre avec la rétractation de l'acquéreur"], "expl": "", "ref": "C. consom., art. L. 313-34 ; CCH, art. L. 271-1 — journée 6", "minlen": 40}, {"th": "D", "kind": "open", "ask": "Expliquez à un client pourquoi comparer deux taux nominaux ne suffit pas.", "model": "Le taux nominal ne rémunère que le capital prêté. Le TAEG agrège tout ce qui CONDITIONNE L'OCTROI : intérêts, frais de dossier, assurance exigée par le prêteur, frais de garantie déterminables, frais d'intermédiation. Une offre au taux nominal légèrement supérieur mais assortie d'une assurance nettement moins chère peut donc coûter moins cher au total. On compare des coûts totaux, ou à défaut des TAEG — jamais des taux affichés.", "points": ["Le taux nominal ne rémunère que le capital", "Le TAEG intègre tout ce qui conditionne l'octroi", "L'assurance et les frais peuvent inverser le classement", "On compare des coûts totaux ou des TAEG"], "expl": "", "ref": "Journée 6, module 4", "minlen": 40}, {"th": "E", "kind": "open", "ask": "Comparez la caution d'un organisme et l'hypothèque, du point de vue du client.", "model": "La caution d'un organisme spécialisé couvre l'ensemble du financement ; elle est généralement la moins coûteuse, une part de la cotisation peut être restituée en fin de prêt, et il n'y a pas de frais de mainlevée en cas de revente. L'hypothèque est une sûreté réelle sur le bien : plus lourde, plus coûteuse, et elle suppose une MAINLEVÉE en cas de vente avant le terme — un poste que les clients découvrent souvent tard. Ce ne sont donc ni les mêmes coûts ni les mêmes effets : deux offres portant des garanties différentes ne se comparent pas ligne à ligne.", "points": ["La caution couvre l'ensemble du financement", "Restitution partielle possible en fin de prêt", "Pas de mainlevée avec une caution", "L'hypothèque est une sûreté réelle sur le bien", "Mainlevée à prévoir en cas de revente", "Deux garanties différentes ne se comparent pas directement"], "expl": "", "ref": "Journée 7, mobilisée en journée 12", "minlen": 40}, {"th": "E", "kind": "open", "ask": "Qu'est-ce que la loi Lemoine a changé pour l'assurance emprunteur ?", "model": "Elle a ouvert la RÉSILIATION À TOUT MOMENT du contrat d'assurance emprunteur, sans frais ni date anniversaire, pendant toute la durée du prêt. Elle a ramené le DROIT À L'OUBLI de dix à cinq ans et l'a étendu à l'hépatite C. Elle a enfin supprimé le QUESTIONNAIRE DE SANTÉ sous deux conditions cumulatives : une part assurée n'excédant pas 200 000 € par emprunteur, et un remboursement intégral avant le soixantième anniversaire de l'assuré. Deux co-emprunteurs peuvent relever de deux régimes différents.", "points": ["Résiliation à tout moment, sans frais", "Droit à l'oubli ramené de dix à cinq ans", "Extension à l'hépatite C", "Suppression du questionnaire de santé sous conditions cumulatives", "200 000 € par emprunteur et remboursement avant le 60e anniversaire"], "expl": "", "ref": "Loi n° 2022-270 du 28 février 2022 — journée 8", "minlen": 40}, {"th": "F", "kind": "open", "ask": "Dans quel ordre déterminez-vous le régime applicable à une opération de regroupement ? Justifiez cet ordre.", "model": "Première question : l'opération est-elle garantie par une hypothèque, par une sûreté comparable sur un bien à usage d'habitation ou par un droit lié à un tel bien ? Si oui, elle relève du régime du CRÉDIT IMMOBILIER quel que soit son objet, et l'on s'arrête là. Seconde question seulement : la part des crédits immobiliers atteint-elle 60 % du montant total de l'opération, coûts compris ? Cet ordre s'impose parce que la règle de la garantie PRIME sur le seuil : calculer une part de 60 % sur une opération hypothécaire est une erreur de méthode.", "points": ["La garantie hypothécaire d'abord", "Si oui : régime immobilier, quel que soit l'objet", "Le seuil de 60 % seulement ensuite", "La part se calcule sur le montant total, coûts compris", "La garantie prime sur le seuil"], "expl": "", "ref": "C. consom., art. R. 314-19 — journées 9 et 11", "minlen": 40}, {"th": "F", "kind": "open", "ask": "Qu'est-ce qu'une balance bancaire, que comporte-t-elle, et à quelle conclusion doit-elle mener ?", "model": "C'est la mise en regard, sur un même document, de la situation actuelle du foyer et de celle qui résulterait de l'opération. Elle a deux fonctions : établir la FAISABILITÉ et rendre l'opération EXPLICABLE au client. AVANT : les revenus, les charges fixes, le détail de chaque crédit, le total des mensualités, le taux d'endettement et le reste à vivre. APRÈS : le montant total à financer — capitaux restant dus, indemnités de remboursement anticipé, frais de dossier, frais de garantie et mainlevée, commission, trésorerie éventuelle — la mensualité nouvelle, la durée, le nouveau taux d'endettement, le nouveau reste à vivre et le coût total. La conclusion doit être MOTIVÉE : la question n'est pas seulement « est-ce faisable » mais « est-ce UTILE ».", "points": ["Mise en regard de la situation avant et après", "Deux fonctions : faisabilité et explicabilité", "Colonne AVANT complète, avec endettement ET reste à vivre", "Le montant à financer ne se résume pas aux capitaux restant dus", "Colonne APRÈS avec la durée et le coût total", "Une conclusion motivée : faisable et utile"], "expl": "", "ref": "Journée 11, séquence 3", "minlen": 40}, {"th": "F", "kind": "open", "ask": "Un couple marié sous le régime légal souhaite regrouper trois crédits, dont deux souscrits par l'épouse seule. Le nouveau prêt serait signé par les deux. Quelle conséquence, et qu'expliquez-vous ?", "model": "Les deux crédits souscrits par l'épouse seule, sans consentement exprès, n'engageaient que ses biens propres et ses revenus : les biens communs étaient protégés. Les reprendre dans un regroupement signé par les deux ÉTEND LE GAGE du créancier aux biens communs. Ce n'est pas interdit, c'est même fréquent, mais cela doit être COMPRIS par les intéressés : l'époux qui signe s'engage sur des dettes qui ne pesaient pas sur le patrimoine commun. Avant de regrouper, il faut donc savoir QUI A SIGNÉ QUOI.", "points": ["Ces dettes n'engageaient que les biens propres et revenus de l'épouse", "Le regroupement signé par les deux étend le gage aux biens communs", "Ce n'est pas interdit mais doit être compris", "Savoir qui a signé quoi avant de regrouper"], "expl": "", "ref": "C. civ., art. 1415 — journée 11", "minlen": 40}, {"th": "G", "kind": "open", "ask": "Qu'est-ce que la fiche d'information standardisée européenne ? Qui la remet, quand, sous quelle forme, et à quel prix ?", "model": "C'est un document d'information PRÉCONTRACTUELLE, normalisé au niveau européen et identique dans toute l'Union, ce qui permet de COMPARER les offres entre elles. Elle est remise par le PRÊTEUR OU L'INTERMÉDIAIRE DE CRÉDIT — l'obligation ne pèse pas seulement sur la banque — au plus tard lors de l'émission de l'offre, GRATUITEMENT, par écrit ou sur un autre support durable, et sous la forme d'un DOCUMENT UNIQUE. Le modèle est annexé au code et doit être utilisé sans modification. Deux mentions méritent l'attention : la rémunération de l'intermédiaire y figure, et le TAEG aussi.", "points": ["Document d'information précontractuelle normalisé au niveau européen", "Il permet de comparer les offres", "Remise par le prêteur OU l'intermédiaire", "Au plus tard lors de l'émission de l'offre", "Gratuitement", "Support durable, document unique", "Modèle annexé au code, sans modification", "La rémunération de l'intermédiaire y figure"], "expl": "", "ref": "C. consom., art. L. 313-7 et R. 313-4 — journée 12", "minlen": 40}, {"th": "G", "kind": "open", "ask": "Énumérez ce que vous vérifiez dans une offre de prêt avant de la transmettre à votre client.", "model": "LES PARTIES : l'identité de l'emprunteur, du co-emprunteur et, le cas échéant, DES CAUTIONS, à qui l'offre est également adressée. LES CHIFFRES : montant, durée, taux débiteur, TAEG, échéancier, coût total. L'ASSURANCE : garanties retenues, quotités par emprunteur, coût et place dans le TAEG. LES GARANTIES : nature de la sûreté, coût, et qui le supporte. LES CONDITIONS : conditions suspensives, frais, conditions de déblocage. LES CLAUSES DE SOUPLESSE : modulation, report, transfert — elles sont CONTRACTUELLES, et c'est ici qu'on vérifie si elles existent. Puis le point décisif : la CONCORDANCE entre le négocié, la FISE et l'offre.", "points": ["Les parties, et les cautions destinataires de l'offre", "Montant, durée, taux, TAEG, échéancier, coût total", "L'assurance : garanties, quotités, coût", "La garantie : nature, coût, qui le supporte", "Conditions suspensives, frais, déblocage", "Modulation, report, transfert — contractuels", "La concordance négocié / FISE / offre"], "expl": "", "ref": "Journée 12, séquence 2", "minlen": 40}, {"th": "G", "kind": "open", "ask": "Quelles sont les pièces qui bloquent un dossier de crédit immobilier, et dans quel ordre demandez-vous les pièces ?", "model": "Un dossier se constitue DANS L'ORDRE DU RISQUE DE BLOCAGE, pas dans l'ordre du formulaire. Ce qui bloque : LA CHAÎNE DES TITRES PUBLIÉS lorsque le bien provient d'une succession — le blocage le plus fréquent et le plus long à lever, lié à l'effet relatif de la publicité foncière ; les revenus atypiques ou récents, dont les justificatifs sont plus lourds ; l'origine de l'apport, qui doit pouvoir être tracée ; les situations de séparation en cours. On demande donc d'abord ce qui bloque, ensuite ce qui complète. Et il faut garder à l'esprit que l'offre a une durée de validité : un dossier qui traîne peut la faire expirer.", "points": ["Dans l'ordre du risque de blocage", "La chaîne des titres publiés en cas de succession", "Les revenus atypiques ou récents", "L'origine de l'apport, à tracer", "Les séparations en cours", "L'offre a une durée de validité"], "expl": "", "ref": "Journée 12, séquence 3", "minlen": 40}, {"th": "G", "kind": "open", "ask": "Un client vous sollicite le même jour pour un crédit à la consommation et pour un projet immobilier, et vous demande si « les délais sont les mêmes ». Que lui répondez-vous ?", "model": "Que ce sont deux régimes distincts, avec deux jeux de documents et deux jeux de délais, et qu'ils ne se mélangent pas. Le crédit à la consommation connaît un délai de RÉTRACTATION, qui bénéficie à l'emprunteur après son acceptation ; le crédit immobilier connaît un délai de RÉFLEXION de dix jours à compter de la réception de l'offre, l'acceptation n'étant possible qu'au onzième jour. Et l'achat lui-même ouvre à l'ACQUÉREUR un droit de rétractation distinct. Les obligations de l'intermédiaire, elles, sont les mêmes dans les deux cas : ce sont les délais, les documents et les seuils qui changent. On ne signe donc pas tout en même temps, non par formalisme, mais parce que chaque régime organise ses propres protections.", "points": ["Deux régimes distincts, qui ne se mélangent pas", "Rétractation en consommation, réflexion en immobilier", "Dix jours à compter de la réception, acceptation au onzième", "La rétractation de l'acquéreur est encore un autre délai", "Les obligations de l'intermédiaire ne changent pas", "Ne pas transposer un délai de l'un à l'autre"], "expl": "", "ref": "Journée 12, séquence 7 — cas mixte", "minlen": 40}], "HAS_THEMES": true, "PASS": 70, "PASS_OK": "Vous avez atteint le seuil de 70 % sur les questions à choix. Le bilan par thème ci-dessous désigne les journées à relire, et vos rédactions sont à comparer aux réponses attendues : à l'épreuve, elles pèsent 45 questions sur 100.", "PASS_KO": "Le seuil de 70 % n'est pas atteint. Ouvrez le bilan par thème : il désigne précisément les journées à reprendre. Relisez les fiches mémo correspondantes, puis <strong>refaites cette évaluation</strong> — elle est rejouable autant de fois que nécessaire.", "PDF": {"header": "TMK PERFORMANCES · IOBSP NIVEAU 2 — ÉVALUATION FINALE", "att_title": "Attestation — Évaluation finale du parcours", "att_sub": "IOBSP Niveau 2 · bilan des douze journées", "footer": "TMK Performances · IOBSP Niveau 2 · Évaluation finale", "fname": "Attestation_IOBSP_evaluation_finale"}};
+const THEME_INFO = CFG.THEME_INFO, THEME_ORDER = CFG.THEME_ORDER;
+const QUESTIONS = CFG.QUESTIONS, TOTAL = QUESTIONS.length, HAS_THEMES = CFG.HAS_THEMES;
+const IS_OPEN = (c)=>c.kind==="open";
+const QCM_N = QUESTIONS.filter(c=>!IS_OPEN(c)).length;
+const OPEN_N = TOTAL - QCM_N;
+const PASS = CFG.PASS, PASS_OK = CFG.PASS_OK, PASS_KO = CFG.PASS_KO;
+const PDF = CFG.PDF;
+
+const state = { nom:"", prenom:"", answers:{}, validated:false, score:0, pdfGenerated:false, dateQuiz:null };
+
+document.getElementById("nom").addEventListener("input", checkIdentity);
+document.getElementById("prenom").addEventListener("input", checkIdentity);
+function checkIdentity(){const n=document.getElementById("nom").value.trim(),p=document.getElementById("prenom").value.trim();document.getElementById("btn-start").disabled=!(n&&p);}
+
+function startQuiz(){
+  state.nom=document.getElementById("nom").value.trim().toUpperCase();
+  let p=document.getElementById("prenom").value.trim();
+  state.prenom=p.charAt(0).toUpperCase()+p.slice(1).toLowerCase();
+  state.dateQuiz=new Date();
+  const full=state.prenom+" "+state.nom;
+  document.getElementById("stagiaire-name").textContent=full;
+  document.getElementById("stagiaire-name-2").textContent=full;
+  const d=state.dateQuiz.toLocaleDateString("fr-FR",{day:"2-digit",month:"long",year:"numeric"});
+  document.getElementById("date-quiz").textContent=d; document.getElementById("date-quiz-2").textContent=d;
+  document.getElementById("screen-identity").style.display="none";
+  document.getElementById("screen-quiz").style.display="block";
+  if(!HAS_THEMES) document.getElementById("recap-block").style.display="none";
+  render();
+}
+
+function themeTag(c){
+  if(!c.th || !THEME_INFO[c.th]) return "";
+  return `<span class="theme-tag">${c.th} · ${THEME_INFO[c.th].label}</span>`;
+}
+
+function render(){
+  const qcm=document.getElementById("qcm"); qcm.innerHTML="";
+  QUESTIONS.forEach((c,i)=>{
+    const tag=themeTag(c);
+    let control;
+    if(IS_OPEN(c)){
+      const prev=state.answers[i]||"";
+      control=`<div class="open-tag">Question ouverte</div><textarea class="oa" data-q="${i}" rows="4" placeholder="Rédigez votre réponse, comme à l'examen — en phrases complètes.">${prev}</textarea><div class="oa-hint">Réponse attendue : ${c.minlen} caractères minimum. La réponse attendue s'affichera après validation : c'est à vous de confronter la vôtre.</div>`;
+    } else if(c.multi){
+      let boxes="";
+      c.options.forEach((o,oi)=>{boxes+=`<label data-opt="${oi}"><input type="checkbox" data-q="${i}" value="${oi}"><span>${o}</span></label>`;});
+      control=`<div class="multi-tag">Plusieurs réponses</div><div class="checks" data-q="${i}">${boxes}</div>`;
+    } else {
+      let opts='<option value="">— choisir une réponse —</option>';
+      c.options.forEach((o,oi)=>opts+=`<option value="${oi}">${o}</option>`);
+      control=`<select class="cs" data-q="${i}">${opts}</select>`;
+    }
+    qcm.innerHTML+=`<div class="cq"><div class="ask"><span class="qn">${i+1}</span><span>${c.ask}${tag}</span></div>${control}<div class="cfb" id="cfb-${i}"></div></div>`;
+  });
+  document.querySelectorAll("select.cs").forEach(s=>s.addEventListener("change",onSelect));
+  document.querySelectorAll(".checks input").forEach(s=>s.addEventListener("change",onCheck));
+  document.querySelectorAll("textarea.oa").forEach(s=>s.addEventListener("input",onOpen));
+  update();
+}
+
+function onSelect(e){ if(state.validated)return; const i=+e.currentTarget.dataset.q,v=e.currentTarget.value; if(v==="") delete state.answers[i]; else state.answers[i]=+v; update(); }
+function onCheck(e){
+  if(state.validated)return; const i=+e.currentTarget.dataset.q;
+  const checked=[...document.querySelectorAll(`.checks input[data-q="${i}"]:checked`)].map(x=>+x.value);
+  if(checked.length===0) delete state.answers[i]; else state.answers[i]=checked.sort((a,b)=>a-b);
+  update();
+}
+
+function onOpen(e){
+  if(state.validated)return; const i=+e.currentTarget.dataset.q, v=e.currentTarget.value.trim();
+  if(v.length < QUESTIONS[i].minlen) delete state.answers[i]; else state.answers[i]=e.currentTarget.value.trim();
+  update();
+}
+
+function update(){
+  const n=Object.keys(state.answers).length;
+  document.getElementById("fill").style.width=(n/TOTAL*100)+"%";
+  document.getElementById("plabel").textContent=n+" / "+TOTAL+" répondu"+(n>1?"es":"");
+  document.getElementById("btn-validate").disabled=(n!==TOTAL);
+}
+
+function isCorrect(c, ans){
+  if(IS_OPEN(c)) return null;          // non notée automatiquement
+  if(ans==null) return false;
+  if(c.multi){
+    const a=[...ans].sort((x,y)=>x-y).join(","), g=[...c.correct].sort((x,y)=>x-y).join(",");
+    return a===g;
+  }
+  return ans===c.correct[0];
+}
+function answerLabel(c, ans){
+  if(ans==null) return "—";
+  if(c.multi) return ans.map(i=>c.options[i]).join(" ; ");
+  return c.options[ans];
+}
+function correctLabel(c){
+  return c.correct.map(i=>c.options[i]).join(" ; ");
+}
+
+function themeStats(){
+  const st={}; THEME_ORDER.forEach(t=>st[t]={ok:0,total:0});
+  QUESTIONS.forEach((c,i)=>{ if(IS_OPEN(c)||!st[c.th])return; st[c.th].total++; if(isCorrect(c,state.answers[i])) st[c.th].ok++; });
+  return st;
+}
+
+function validateQuiz(){
+  if(state.validated)return; state.validated=true;
+  let score=0;
+  QUESTIONS.forEach((c,i)=>{
+    const ans=state.answers[i], ok=isCorrect(c,ans); if(ok)score++;
+    if(IS_OPEN(c)){
+      const ta=document.querySelector(`textarea.oa[data-q="${i}"]`); ta.disabled=true;
+      const pts=(c.points&&c.points.length)?`<ul>${c.points.map(x=>`<li>${x}</li>`).join("")}</ul>`:"";
+      const rf=c.ref?`<p class="ref">${c.ref}</p>`:"";
+      const f0=document.getElementById("cfb-"+i);
+      f0.className="cfb good";
+      f0.innerHTML=`<div class="model"><h5>La réponse attendue</h5><p>${c.model}</p>${pts}${rf}<p class="note">Cette question n'est pas notée automatiquement : confrontez votre rédaction à la réponse attendue. Votre texte et la réponse attendue figurent tous deux dans votre attestation PDF.</p></div>`;
+      requestAnimationFrame(()=>f0.classList.add("show"));
+      return;
+    }
+    if(c.multi){
+      const cont=document.querySelector(`.checks[data-q="${i}"]`);
+      cont.querySelectorAll("input").forEach(x=>x.disabled=true);
+      c.correct.forEach(g=>cont.querySelector(`label[data-opt="${g}"]`).classList.add("ok"));
+      (ans||[]).forEach(a=>{ if(!c.correct.includes(a)) cont.querySelector(`label[data-opt="${a}"]`).classList.add("ko"); });
+    } else {
+      const sel=document.querySelector(`select.cs[data-q="${i}"]`); sel.disabled=true;
+      sel.classList.add(ok?"ok":"ko");
+    }
+    const f=document.getElementById("cfb-"+i);
+    f.className="cfb "+(ok?"good":"bad");
+    const vd=ok?"Exact.":((c.multi?"Bonnes réponses : ":"Bonne réponse : ")+correctLabel(c)+".");
+    const refLine=c.ref?`<br><span class="ref">${c.ref}</span>`:"";
+    f.innerHTML=`<span class="vd">${vd}</span> ${c.expl}${refLine}`;
+    requestAnimationFrame(()=>f.classList.add("show"));
+  });
+  state.score=score;
+  document.getElementById("score").textContent=score;
+  document.getElementById("btn-validate").disabled=true;
+  generatePDF();
+  showResults();
+}
+
+function showResults(){
+  const pct=Math.round(state.score/QCM_N*100);
+  document.getElementById("screen-result").style.display="block";
+  document.getElementById("score-value").textContent=state.score+"/"+QCM_N;
+  const sl=document.getElementById("score-label"); if(sl) sl.textContent = OPEN_N ? "questions à choix" : "questions";
+  const c=document.getElementById("score-circle"),m=document.getElementById("result-message"),d=document.getElementById("result-detail");
+  const suffix = OPEN_N ? " Vos "+OPEN_N+" question"+(OPEN_N>1?"s":"")+" ouverte"+(OPEN_N>1?"s ne sont":" n'est")+" pas notée"+(OPEN_N>1?"s":"")+" : confrontez votre rédaction à la réponse attendue, affichée sous chacune." : "";
+  c.className="score-circle";
+  if(PASS){
+    const ok = pct>=PASS;
+    c.classList.add(ok?(pct>=90?"excellent":"good"):(pct>=50?"average":"poor"));
+    m.textContent = ok ? "Objectif atteint" : "Objectif non atteint";
+    d.textContent = (ok?"Vous êtes au-dessus du seuil de "+PASS+" %.":"Vous êtes en dessous du seuil de "+PASS+" %.")+suffix;
+    const b=document.getElementById("pass-banner");
+    b.className="pass-banner "+(ok?"ok":"ko");
+    b.innerHTML = ok
+      ? `<b>Réussite — ${pct} % de bonnes réponses</b>${PASS_OK||"Vous avez atteint le seuil de "+PASS+" %. Les acquis de la journée sont consolidés : vous pouvez aborder la suite du parcours."}`
+      : `<b>Seuil non atteint — ${pct} % de bonnes réponses</b>${PASS_KO||"Le seuil de réussite est fixé à "+PASS+" %. Reprenez les fiches mémo et les séquences des thèmes en rouge, puis <strong>refaites ce QCM afin de vous entraîner</strong> : c'est en le repassant que les automatismes s'installent."}`;
+    b.style.display="block";
+  }
+  else if(pct>=90){c.classList.add("excellent");m.textContent="Évaluation validée — Excellent !";d.textContent="Vous maîtrisez l'ensemble des notions du module."+suffix;}
+  else if(pct>=70){c.classList.add("good");m.textContent="Évaluation validée";d.textContent="Bon niveau global. Le détail commenté de vos réponses figure ci-dessus."+suffix;}
+  else if(pct>=50){c.classList.add("average");m.textContent="Presque — à consolider";d.textContent="Acquis partiels. Le détail commenté de chaque réponse figure ci-dessus."+suffix;}
+  else{c.classList.add("poor");m.textContent="À retravailler";d.textContent="Le détail commenté reprend la bonne réponse et l'explication de chaque question."+suffix;}
+
+  if(HAS_THEMES){
+    const st=themeStats(); let html="";
+    THEME_ORDER.forEach(t=>{
+      const s=st[t]; if(!s||s.total===0) return;
+      const full=(s.ok===s.total);
+      const color=full?"var(--ok)":(s.ok===0?"var(--ko)":"var(--amber)");
+      html+=`<div class="recap-row"><span class="dot" style="background:${color}"></span><span class="lab">${t} · ${THEME_INFO[t].label}</span><span class="sc">${s.ok} / ${s.total}</span></div>`;
+    });
+    document.getElementById("recap-list").innerHTML=html;
+  }
+  const np=document.getElementById("note-pdf");
+  if(state.pdfGenerated){np.textContent="✓ Votre attestation PDF a été générée et téléchargée pour cette session. Vous pouvez refaire l'évaluation, mais aucun nouveau PDF ne sera généré.";np.style.display="block";}
+  document.getElementById("screen-result").scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+function restartQuiz(){
+  state.answers={};state.validated=false;state.score=0;state.dateQuiz=new Date();
+  const d=state.dateQuiz.toLocaleDateString("fr-FR",{day:"2-digit",month:"long",year:"numeric"});
+  document.getElementById("date-quiz").textContent=d;document.getElementById("date-quiz-2").textContent=d;
+  document.getElementById("score").textContent="—";
+  const bv=document.getElementById("btn-validate");
+  if(state.pdfGenerated) bv.textContent="Valider l'évaluation";
+  document.getElementById("note-pdf").style.display="none";
+  const pb=document.getElementById("pass-banner"); if(pb) pb.style.display="none";
+  document.getElementById("screen-result").style.display="none";
+  render(); window.scrollTo({top:0,behavior:"smooth"});
+}
+
+/* ───────── PDF (attestation) ───────── */
+function generatePDF(){
+  if(state.pdfGenerated)return;
+  if(!window.jspdf||!window.jspdf.jsPDF){return;}
+  const { jsPDF }=window.jspdf;
+  const doc=new jsPDF({unit:"mm",format:"a4"});
+  const pageW=doc.internal.pageSize.getWidth(), pageH=doc.internal.pageSize.getHeight();
+  const margin=18; let y=0;
+  const NAVY=[22,36,59],BLUE=[31,78,121],OKC=[47,122,79],KOC=[178,59,59],AMB=[181,133,42];
+  const footer=()=>{const tp=doc.internal.getNumberOfPages();for(let i=1;i<=tp;i++){doc.setPage(i);doc.setFont("helvetica","italic");doc.setFontSize(8);doc.setTextColor(150,150,150);doc.text(`Page ${i} / ${tp}  —  ${PDF.footer}`,pageW/2,pageH-8,{align:"center"});}};
+  const ensure=(h)=>{if(y+h>pageH-18){doc.addPage();y=margin;}};
+
+  doc.setFillColor(...NAVY);doc.rect(0,0,pageW,38,"F");
+  doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");doc.setFontSize(9);
+  doc.text(PDF.header,margin,13);
+  doc.setFontSize(15);doc.text(PDF.att_title,margin,24);
+  doc.setFont("helvetica","normal");doc.setFontSize(10);
+  doc.text(PDF.att_sub,margin,32);
+  y=50;
+
+  doc.setFillColor(239,234,223);doc.rect(margin,y,pageW-2*margin,26,"F");
+  doc.setTextColor(...BLUE);doc.setFont("helvetica","bold");doc.setFontSize(11);doc.text("Stagiaire",margin+4,y+7);
+  doc.setFont("helvetica","normal");doc.setTextColor(40,40,40);doc.setFontSize(12);doc.text(`${state.prenom} ${state.nom}`,margin+4,y+15);
+  doc.setFontSize(9);doc.setTextColor(100,100,100);
+  const dS=state.dateQuiz.toLocaleDateString("fr-FR",{day:"2-digit",month:"long",year:"numeric"});
+  const tS=state.dateQuiz.toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"});
+  doc.text(`Évaluation réalisée le ${dS} à ${tS}`,margin+4,y+22);
+  y+=36;
+
+  const pct=Math.round(state.score/QCM_N*100);
+  let col=KOC,lab="À retravailler";
+  if(PASS){ const ok=pct>=PASS; col=ok?OKC:AMB; lab=ok?"Réussite":"Seuil non atteint"; }
+  else if(pct>=90){col=OKC;lab="Excellent";}else if(pct>=70){col=BLUE;lab="Validé";}else if(pct>=50){col=AMB;lab="À consolider";}
+  doc.setFillColor(...col);doc.rect(margin,y,pageW-2*margin,28,"F");
+  doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");doc.setFontSize(22);doc.text(`${state.score} / ${QCM_N}`,margin+6,y+13);
+  doc.setFontSize(11);doc.text(`(${pct}%)  —  questions à choix`,margin+6,y+22);
+  doc.setFontSize(13);doc.text(lab,pageW-margin-6,y+17,{align:"right"});
+  y+=34;
+
+  if(PASS){
+    const ok=pct>=PASS;
+    const msg = ok ? `Seuil de reussite : ${PASS} %. Objectif atteint.`
+                   : `Seuil de reussite : ${PASS} %. Objectif non atteint : refaites ce QCM afin de vous entrainer.`;
+    doc.setFont("helvetica","italic");doc.setFontSize(9);doc.setTextColor(...(ok?OKC:AMB));
+    doc.text(msg,margin,y+2); y+=8;
+  }
+  if(OPEN_N){
+    doc.setFont("helvetica","italic");doc.setFontSize(8.5);doc.setTextColor(120,120,120);
+    doc.text(`${OPEN_N} question(s) ouverte(s) : non notees automatiquement — voir la section dediee en fin de document.`,margin,y+2);
+    y+=8;
+  }
+  y+=2;
+
+  if(HAS_THEMES){
+    const st=themeStats();
+    doc.setFillColor(...NAVY);doc.rect(margin,y,pageW-2*margin,9,"F");
+    doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");doc.setFontSize(11);doc.text("Bilan par thème",margin+4,y+6.2);y+=12;
+    THEME_ORDER.forEach(t=>{
+      const s=st[t]; if(!s||s.total===0) return;
+      const full=(s.ok===s.total); const cc=full?OKC:(s.ok===0?KOC:AMB);
+      ensure(7);
+      doc.setFillColor(...cc);doc.circle(margin+3,y-0.5,1.4,"F");
+      doc.setFont("helvetica","normal");doc.setFontSize(9.5);doc.setTextColor(55,55,55);
+      doc.text(`${t} · ${THEME_INFO[t].label}`,margin+8,y);
+      doc.setFont("helvetica","bold");doc.text(`${s.ok} / ${s.total}`,margin+92,y);
+      y+=6.5;
+    });
+    y+=4;
+  }
+
+  doc.setFillColor(...NAVY);doc.rect(margin,y,pageW-2*margin,9,"F");
+  doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");doc.setFontSize(11);doc.text("Détail des réponses",margin+4,y+6.2);
+  doc.setFontSize(9);doc.text(`${QCM_N} question${QCM_N>1?"s":""} à choix`,pageW-margin-4,y+6.2,{align:"right"});y+=12;
+
+  QUESTIONS.forEach((c,i)=>{
+    if(IS_OPEN(c)) return;
+    const ans=state.answers[i], ok=isCorrect(c,ans);
+    const head=(c.th?`[${c.th}] `:"")+c.ask;
+    const qLines=doc.splitTextToSize(`${i+1}. ${head}`,pageW-2*margin-16);
+    const yLines=doc.splitTextToSize(`Votre réponse : ${answerLabel(c,ans)}`,pageW-2*margin-10);
+    const gLines=doc.splitTextToSize(`${c.multi?"Bonnes réponses":"Bonne réponse"} : ${correctLabel(c)}`,pageW-2*margin-10);
+    const eLines=doc.splitTextToSize(c.expl+(c.ref?"  ("+c.ref+")":""),pageW-2*margin-10);
+    const h=6+qLines.length*4+4+yLines.length*4+gLines.length*4+4+eLines.length*4+6;
+    ensure(h);
+    doc.setFillColor(ok?OKC[0]:KOC[0],ok?OKC[1]:KOC[1],ok?OKC[2]:KOC[2]);doc.rect(margin,y,2,h-3,"F");
+    doc.setFont("helvetica","bold");doc.setFontSize(9.5);doc.setTextColor(ok?OKC[0]:KOC[0],ok?OKC[1]:KOC[1],ok?OKC[2]:KOC[2]);doc.text(ok?"[OK]":"[X]",margin+5,y+5);
+    doc.setTextColor(55,55,55);doc.text(qLines,margin+16,y+5);
+    let yy=y+5+qLines.length*4+2;
+    doc.setFont("helvetica","bold");doc.setFontSize(8.5);doc.setTextColor(100,100,100);doc.text(yLines,margin+5,yy);yy+=yLines.length*4;
+    doc.setTextColor(40,100,60);doc.text(gLines,margin+5,yy);yy+=gLines.length*4+1;
+    doc.setFont("helvetica","italic");doc.setFontSize(8.5);doc.setTextColor(90,90,90);doc.text(eLines,margin+5,yy);
+    y+=h;
+  });
+
+  if(OPEN_N){
+    ensure(20);
+    doc.setFillColor(...NAVY);doc.rect(margin,y,pageW-2*margin,9,"F");
+    doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");doc.setFontSize(11);doc.text("Questions ouvertes — votre rédaction et la réponse attendue",margin+4,y+6.2);
+    doc.setFontSize(9);doc.text(`${OPEN_N} question${OPEN_N>1?"s":""}`,pageW-margin-4,y+6.2,{align:"right"});y+=12;
+    doc.setFont("helvetica","italic");doc.setFontSize(8.5);doc.setTextColor(120,120,120);
+    const iL=doc.splitTextToSize("Ces questions ne sont pas notees automatiquement : aucune correction de texte libre ne serait fiable. Confrontez votre redaction a la reponse attendue, et sollicitez votre referent pedagogique en cas de doute.",pageW-2*margin);
+    doc.text(iL,margin,y); y+=iL.length*4+4;
+
+    let n=0;
+    QUESTIONS.forEach((c,i)=>{
+      if(!IS_OPEN(c)) return; n++;
+      const mine=(state.answers[i]||"— non renseignée —");
+      const qLines=doc.splitTextToSize(`${n}. ${(c.th?`[${c.th}] `:"")+c.ask}`,pageW-2*margin-10);
+      const aLines=doc.splitTextToSize(mine,pageW-2*margin-14);
+      const mLines=doc.splitTextToSize(c.model,pageW-2*margin-14);
+      const pLines=(c.points||[]).map(x=>doc.splitTextToSize("- "+x,pageW-2*margin-16)).flat();
+      const h=6+qLines.length*4+6+aLines.length*4+6+mLines.length*4+pLines.length*4+(c.ref?5:0)+8;
+      ensure(Math.min(h,pageH-2*margin));
+      doc.setFillColor(...BLUE);doc.rect(margin,y,2,Math.min(h-3,pageH-y-20),"F");
+      doc.setFont("helvetica","bold");doc.setFontSize(9.5);doc.setTextColor(55,55,55);
+      doc.text(qLines,margin+6,y+5); let yy=y+5+qLines.length*4+3;
+      doc.setFont("helvetica","bold");doc.setFontSize(8.5);doc.setTextColor(100,100,100);doc.text("Votre reponse :",margin+6,yy);yy+=4;
+      doc.setFont("helvetica","normal");doc.setTextColor(60,60,60);
+      aLines.forEach(l=>{ensure(5);doc.text(l,margin+10,yy);yy+=4;});
+      yy+=3;
+      doc.setFont("helvetica","bold");doc.setTextColor(40,100,60);ensure(5);doc.text("Reponse attendue :",margin+6,yy);yy+=4;
+      doc.setFont("helvetica","normal");doc.setTextColor(60,80,65);
+      mLines.forEach(l=>{ensure(5);doc.text(l,margin+10,yy);yy+=4;});
+      pLines.forEach(l=>{ensure(5);doc.text(l,margin+12,yy);yy+=4;});
+      if(c.ref){doc.setFont("helvetica","italic");doc.setTextColor(150,120,80);ensure(5);doc.text(c.ref,margin+10,yy+1);yy+=5;}
+      y=yy+6;
+    });
+  }
+
+  footer();
+  const safe=(s)=>s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-zA-Z0-9]/g,"_");
+  const df=state.dateQuiz.toISOString().slice(0,10);
+  doc.save(`${PDF.fname}_${safe(state.nom)}_${safe(state.prenom)}_${df}.pdf`);
+
+  state.pdfGenerated=true;
+}
+</script>
+<style>
+body{-webkit-user-select:none;-ms-user-select:none;user-select:none}
+textarea,input{-webkit-user-select:text;-ms-user-select:text;user-select:text}
+</style>
+<script>
+['copy','cut','paste','contextmenu','dragstart'].forEach(function(evt){
+  document.addEventListener(evt,function(e){e.preventDefault();return false;},true);
+});
+</script>
+</body>
+</html>
